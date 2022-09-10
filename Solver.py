@@ -5,30 +5,31 @@ import math
 def generate_random_guess_word(possible_words):
     return random.choice(possible_words)
 
+def calc_letter_entropy(freq):
+    p = freq
+    return -1 * p * math.log2(p) - (1-p) * math.log2(1-p)
+
+def calc_word_entropy(word, freq_dict):
+    total = 0
+    for l in word:
+        freq = freq_dict[l]
+        total += calc_letter_entropy(freq)
+    return total
+
 def freq_words(possible_words):
-    most_common_letters = {'e':0.111607, 't':0.069509, 'a':0.084966, 'o':0.071635, 'i':0.075448, 'n':0.066544, 's':0.057351, 'r':0.075809, 'l':0.054893, 'c':0.045388, 'u': 0.036308, 'd':0.033844, 'p':0.031671, 'm': 0.030129, 'h':0.030034, 'g':0.024705, 'b':0.020720, 'f':0.018121, 'y':0.017779, 'w':0.012899, 'k': 0.011016, 'v':0.010074, 'x':0.002902, 'z':0.002722, 'j':0.001965, 'q':0.001962}
+    freq_dict = {'e':0.111607, 't':0.069509, 'a':0.084966, 'o':0.071635, 'i':0.075448, 'n':0.066544, 's':0.057351, 'r':0.075809, 'l':0.054893, 'c':0.045388, 'u': 0.036308, 'd':0.033844, 'p':0.031671, 'm': 0.030129, 'h':0.030034, 'g':0.024705, 'b':0.020720, 'f':0.018121, 'y':0.017779, 'w':0.012899, 'k': 0.011016, 'v':0.010074, 'x':0.002902, 'z':0.002722, 'j':0.001965, 'q':0.001962}
     good_options = [word for word in possible_words if len(set(word)) == len(word)]
     if len(good_options) == 0:
         good_options = possible_words
-#     print('good')
-#     print(good_options)
-    words_freq = []
-    for word in good_options:
-        temp_lst = []
-        for l in word:
-            temp_lst.append(most_common_letters[l])
-        words_freq.append([word, math.prod(temp_lst)])
-    for i in range(len(words_freq)):
-        p = words_freq[i][1]
-        log = -1 * p * math.log(p, 2) - (1-p) * math.log(1-p, 2)
-        words_freq[i] = [words_freq[i][0], log]
-#     print(words_freq)
+    
     max_entropy = float('-inf')
     max_entropy_word = ''
-    for elem in words_freq:
-        if elem[1] > max_entropy:
-            max_entropy = elem[1]
-            max_entropy_word = elem[0]
+    for word in good_options:
+        entropy = calc_word_entropy(word, freq_dict)
+        if entropy > max_entropy:
+            max_entropy = entropy
+            max_entropy_word = word
+    
     return max_entropy_word
 
 #should calc entropy for all possible_words then pick the highest
@@ -142,6 +143,41 @@ def make_evaluate_guess(word, word_list):
                     break
         return ''.join(result)
     return evaluate_guess
+
+# def freq_prob(word, freq = {}, num = 0):
+#     for l in word:
+#         num +=1
+#         if l in freq: freq[l] += 1
+#         else: freq[l] = 1
+#     return freq,num
+# def to_prob(freq,num):
+#     for l in freq: freq[l] = freq[l]/num
+    
+# def entropy_calc(p): 
+#     n = 1 - p
+#     return -(p)*math.log2(p)-(n)*math.log2(n)
+# def word_entropy(word, prob):
+#     num = 0
+#     for l in word:
+#         if l not in prob: return 0
+#         num+=entropy_calc(prob[l])
+#     return num
+# def generate_smart_guess(word_list, possible_words, nth_guess):
+#     if len(possible_words) == 1: return possible_words[0]
+#     freq = {} 
+#     num = 0
+#     for w in possible_words:
+#         freq,num = freq_prob(w,freq,num)
+#     to_prob(freq,num)
+#     max_entropy = word_entropy(possible_words[0], freq)
+#     max_word = possible_words[0]
+#     for w in possible_words:
+#         cur_ent = word_entropy(w, freq)
+#         if cur_ent > max_entropy:
+#             max_entropy = cur_ent
+#             max_word = w
+    
+#     return max_word
 
 def solver(word_list, evaluate_guess_func):
     count = 1
