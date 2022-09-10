@@ -18,13 +18,10 @@ def calc_word_entropy(word, freq_dict):
 
 def freq_words(possible_words):
     freq_dict = {'e':0.111607, 't':0.069509, 'a':0.084966, 'o':0.071635, 'i':0.075448, 'n':0.066544, 's':0.057351, 'r':0.075809, 'l':0.054893, 'c':0.045388, 'u': 0.036308, 'd':0.033844, 'p':0.031671, 'm': 0.030129, 'h':0.030034, 'g':0.024705, 'b':0.020720, 'f':0.018121, 'y':0.017779, 'w':0.012899, 'k': 0.011016, 'v':0.010074, 'x':0.002902, 'z':0.002722, 'j':0.001965, 'q':0.001962}
-    good_options = [word for word in possible_words if len(set(word)) == len(word)]
-    if len(good_options) == 0:
-        good_options = possible_words
     
     max_entropy = float('-inf')
     max_entropy_word = ''
-    for word in good_options:
+    for word in possible_words:
         entropy = calc_word_entropy(word, freq_dict)
         if entropy > max_entropy:
             max_entropy = entropy
@@ -144,56 +141,21 @@ def make_evaluate_guess(word, word_list):
         return ''.join(result)
     return evaluate_guess
 
-# def freq_prob(word, freq = {}, num = 0):
-#     for l in word:
-#         num +=1
-#         if l in freq: freq[l] += 1
-#         else: freq[l] = 1
-#     return freq,num
-# def to_prob(freq,num):
-#     for l in freq: freq[l] = freq[l]/num
-    
-# def entropy_calc(p): 
-#     n = 1 - p
-#     return -(p)*math.log2(p)-(n)*math.log2(n)
-# def word_entropy(word, prob):
-#     num = 0
-#     for l in word:
-#         if l not in prob: return 0
-#         num+=entropy_calc(prob[l])
-#     return num
-# def generate_smart_guess(word_list, possible_words, nth_guess):
-#     if len(possible_words) == 1: return possible_words[0]
-#     freq = {} 
-#     num = 0
-#     for w in possible_words:
-#         freq,num = freq_prob(w,freq,num)
-#     to_prob(freq,num)
-#     max_entropy = word_entropy(possible_words[0], freq)
-#     max_word = possible_words[0]
-#     for w in possible_words:
-#         cur_ent = word_entropy(w, freq)
-#         if cur_ent > max_entropy:
-#             max_entropy = cur_ent
-#             max_word = w
-    
-#     return max_word
-
 def solver(word_list, evaluate_guess_func):
     count = 1
     possible_words = word_list
-    while count <= 6:
+    while len(possible_words) != 1 and count <= 6:
         guess_word = generate_smart_guess(word_list, possible_words, count)
         colours = evaluate_guess_func(guess_word)
         new_word_list = filter_available_words(guess_word, colours, possible_words)
         possible_words = new_word_list
         count+=1
     if len(possible_words) == 1:
+        print(count)
         return possible_words[0]
     else:
         print('EXCEED 6')
         return possible_words
-
 
 
 if __name__ == "__main__":
@@ -208,3 +170,6 @@ if __name__ == "__main__":
 
     cases_game = make_evaluate_guess("cases", word_list)
     print(solver(word_list, cases_game)) # Should print 'cases'
+
+    which_game = make_evaluate_guess("which", word_list)
+    print(solver(word_list, which_game)) # Should print 'which'
